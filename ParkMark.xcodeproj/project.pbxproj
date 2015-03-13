@@ -7,8 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		33C6D90A1AB36DB4002A7A22 /* Marker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33C6D9091AB36DB4002A7A22 /* Marker.swift */; };
+		33C6D90E1AB38187002A7A22 /* MapMarker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33C6D90D1AB38187002A7A22 /* MapMarker.swift */; };
 		9F286E161AB346D000A75E78 /* ParkViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F286E151AB346D000A75E78 /* ParkViewController.swift */; };
-		9F286E1C1AB34F1000A75E78 /* Marker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F286E1B1AB34F1000A75E78 /* Marker.swift */; };
 		9F35FB781AB344F900C62E64 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F35FB771AB344F900C62E64 /* AppDelegate.swift */; };
 		9F35FB7B1AB344F900C62E64 /* ParkMark.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 9F35FB791AB344F900C62E64 /* ParkMark.xcdatamodeld */; };
 		9F35FB801AB344F900C62E64 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9F35FB7E1AB344F900C62E64 /* Main.storyboard */; };
@@ -28,8 +29,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		33C6D9091AB36DB4002A7A22 /* Marker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Marker.swift; sourceTree = "<group>"; };
+		33C6D90D1AB38187002A7A22 /* MapMarker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapMarker.swift; sourceTree = "<group>"; };
 		9F286E151AB346D000A75E78 /* ParkViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParkViewController.swift; sourceTree = "<group>"; };
-		9F286E1B1AB34F1000A75E78 /* Marker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Marker.swift; path = ../Marker.swift; sourceTree = "<group>"; };
 		9F35FB721AB344F900C62E64 /* ParkMark.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ParkMark.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F35FB761AB344F900C62E64 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9F35FB771AB344F900C62E64 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -71,7 +73,8 @@
 		9F286E1D1AB34F1D00A75E78 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				9F286E1B1AB34F1000A75E78 /* Marker.swift */,
+				33C6D9091AB36DB4002A7A22 /* Marker.swift */,
+				33C6D90D1AB38187002A7A22 /* MapMarker.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -234,9 +237,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				33C6D90E1AB38187002A7A22 /* MapMarker.swift in Sources */,
 				9F286E161AB346D000A75E78 /* ParkViewController.swift in Sources */,
-				9F286E1C1AB34F1000A75E78 /* Marker.swift in Sources */,
 				9F35FB7B1AB344F900C62E64 /* ParkMark.xcdatamodeld in Sources */,
+				33C6D90A1AB36DB4002A7A22 /* Marker.swift in Sources */,
 				9F35FB781AB344F900C62E64 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
