@@ -16,10 +16,12 @@ class ParkViewController: UIViewController, MKMapViewDelegate, CLLocationManager
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var actionButton: UIButton!
     @IBOutlet weak var locateButton: UIButton!
+    @IBOutlet weak var directionsButton: UIButton!
 
     // MARK: - Variables
     
     var currentMarker: Marker?
+    var lastLocation: CLLocation?
     var mapMarker: MapMarker?
     var routeOverlay: MKOverlay?
     
@@ -46,6 +48,7 @@ class ParkViewController: UIViewController, MKMapViewDelegate, CLLocationManager
 
         // Set up the location manager
         locationManager.delegate = self
+        locationManager.distanceFilter = kCLDistanceFilterNone
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestAlwaysAuthorization()
         locationManager.startUpdatingLocation()
@@ -58,57 +61,67 @@ class ParkViewController: UIViewController, MKMapViewDelegate, CLLocationManager
         super.viewDidAppear(animated)
     }
 
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "DirectionsSegue" || segue.identifier == "DirectDirectionsSegue" {
+            let directionsController = segue.destinationViewController as DirectionsViewController
+            directionsController.source = MKPlacemark(coordinate: mapMarker!.coordinate, addressDictionary: nil)
+            directionsController.destination = MKPlacemark(coordinate: currentMarker!.coordinate, addressDictionary: nil)
+        }
+    }
+    
+    override func shouldPerformSegueWithIdentifier(identifier: String?, sender: AnyObject?) -> Bool {
+        // Check the text on the sender
+        if let button = sender as? UIButton {
+            if let label = button.titleLabel?.text {
+                if label == "Find Car" || label == "Show Directions" {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
     // MARK: - IBAction
 
+    @IBAction func doneButton(segue: UIStoryboardSegue) {
+        
+    }
+    
     @IBAction func respondToActionButton(sender: UIButton) {
         // Get the current status of the action button, and figure out what to do from there
         let status = defaults.integerForKey(CURRENT_STATUS_KEY)
         switch status {
-            case ParkViewStatus.Start.rawValue:
-                var marker = NSEntityDescription.insertNewObjectForEntityForName("Marker", inManagedObjectContext: managedObjectContext!) as Marker
-                if let tempMarker = mapMarker {
-                    marker.latitude = tempMarker.coordinate.latitude
-                    marker.longitude = tempMarker.coordinate.longitude
-                }
-                currentMarker = marker
-                defaults.setInteger(ParkViewStatus.Locate.rawValue, forKey: CURRENT_STATUS_KEY)
-            case ParkViewStatus.Locate.rawValue:
-                if let current = currentMarker {
-                    if let map = mapMarker {
-                        let source = map.coordinate
-                        let destination = current.coordinate
-                        defaults.setInteger(ParkViewStatus.Finish.rawValue, forKey: CURRENT_STATUS_KEY)
-                        let request = MKDirectionsRequest()
-                        request.setSource(MKMapItem(placemark: MKPlacemark(coordinate: source, addressDictionary: nil)))
-                        request.setDestination(MKMapItem(placemark: MKPlacemark(coordinate: destination, addressDictionary: nil)))
-                        let directions = MKDirections(request: request)
-                        directions.calculateDirectionsWithCompletionHandler({(response: MKDirectionsResponse!, error: NSError!) in
-                            if error != nil {
-                                // Handle error here
-                            } else {
-                                for route in response.routes as [MKRoute] {
-                                    self.routeOverlay = route.polyline
-                                    self.mapView.addOverlay(self.routeOverlay, level: MKOverlayLevel.AboveRoads)
-                                    for step in route.steps {
-                                        println(step.instructions)
-                                    }
-                                }
-                            }
-                        })
-                    }
-                }
-            case ParkViewStatus.Finish.rawValue:
-                self.mapView.removeOverlay(self.routeOverlay)
-                defaults.setInteger(ParkViewStatus.Start.rawValue, forKey: CURRENT_STATUS_KEY)
-            default: ()
+
+        case ParkViewStatus.Start.rawValue:
+            var marker = NSEntityDescription.insertNewObjectForEntityForName("Marker", inManagedObjectContext: managedObjectContext!) as Marker
+            if let tempMarker = mapMarker {
+                marker.latitude = tempMarker.coordinate.latitude
+                marker.longitude = tempMarker.coordinate.longitude
+            }
+            currentMarker = marker
+            defaults.setInteger(ParkViewStatus.Locate.rawValue, forKey: CURRENT_STATUS_KEY)
+
+        case ParkViewStatus.Locate.rawValue:
+            defaults.setInteger(ParkViewStatus.Finish.rawValue, forKey: CURRENT_STATUS_KEY)
+        
+        case ParkViewStatus.Finish.rawValue:
+            defaults.setInteger(ParkViewStatus.Start.rawValue, forKey: CURRENT_STATUS_KEY)
+            
+        default: ()
+        
         }
         setActionButtonStatus()
     }
 
     @IBAction func getCurrentLocation(sender: UIButton) {
-        if (verifyLocationSettings() && locationManager.location != nil) {
-            let region = MKCoordinateRegionMakeWithDistance(locationManager.location.coordinate, 500, 500)
+        if (verifyLocationSettings() && lastLocation != nil) {
+            let region = MKCoordinateRegionMakeWithDistance(lastLocation!.coordinate, 500, 500)
             mapView.setRegion(region, animated: true)
+            if let marker = mapMarker {
+                mapView.removeAnnotation(marker)
+            }
+            mapMarker = MapMarker(coordinate: lastLocation!.coordinate)
+            mapView.addAnnotation(mapMarker)
         }
     }
 
@@ -125,13 +138,6 @@ class ParkViewController: UIViewController, MKMapViewDelegate, CLLocationManager
         mapMarker = MapMarker(coordinate: mapView.centerCoordinate)
         mapView.addAnnotation(mapMarker)
     }
-
-    func mapView(mapView: MKMapView!, rendererForOverlay overlay: MKOverlay!) -> MKOverlayRenderer! {
-        let renderer = MKPolylineRenderer(overlay: overlay)
-        renderer.strokeColor = UIColor.blueColor()
-        renderer.lineWidth = 5.0
-        return renderer
-    }
     
     // MARK: - CLLocationManagerDelegate
 
@@ -139,6 +145,10 @@ class ParkViewController: UIViewController, MKMapViewDelegate, CLLocationManager
         if status == .AuthorizedWhenInUse || status == .AuthorizedAlways {
             manager.startUpdatingLocation()
         }
+    }
+
+    func locationManager(manager: CLLocationManager!, didUpdateToLocation newLocation: CLLocation!, fromLocation oldLocation: CLLocation!) {
+        lastLocation = newLocation
     }
 
     // MARK: - UIGestureRecognizerDelegate
@@ -162,10 +172,12 @@ class ParkViewController: UIViewController, MKMapViewDelegate, CLLocationManager
         }
         switch status {
             case ParkViewStatus.Start.rawValue:
+                directionsButton.hidden = true
                 actionButton.setTitle("Record Location", forState: UIControlState.Normal)
             case ParkViewStatus.Locate.rawValue:
                 actionButton.setTitle("Find Car", forState: UIControlState.Normal)
             case ParkViewStatus.Finish.rawValue:
+                directionsButton.hidden = false
                 actionButton.setTitle("Finish", forState: UIControlState.Normal)
             default: ()
         }
