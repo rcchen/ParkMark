@@ -25,14 +25,14 @@ detection really leaves something to be desired.
 * Main map screen
     * UINavigationBarController as the wrapper for the application
     * MKMapView for the underlying map
-    * CLLocationManager for getting the user's current location
+    * CLLocationManager for getting the user's current location (heavy)
     * UIGestureRecognizer for panning on the map
     * UIButtonView for the buttons on the screen
 
 * Directions screen
     * Segue to get to the directions screen (presented as a modal)
-    * MKDirections/MKDirectionsRequest for retrieving directions from Apple Maps servers
-    * MKOverlayRenderer for drawing routes onto the MKMapView
+    * MKDirections/MKDirectionsRequest for retrieving directions from Apple Maps servers (heavy)
+    * MKOverlayRenderer for drawing routes onto the MKMapView (heavy)
     * UITableView for displaying directions
     * UINavigationBar for a title and dismissing the directions
     * Custom UITableViewCell for showing directions
@@ -40,6 +40,7 @@ detection really leaves something to be desired.
     * MKAnnotations that were placed on the map for start/end points
 
 * Overall
+    * The application works with all devices, in all orientations.
     * There is a pomeranian as the app icon. That is all.
 
 #### Future Direction
